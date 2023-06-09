@@ -1,6 +1,7 @@
 import os
 import yfinance as yf
-from datetime import datetime
+from datetime import datetime, timedelta
+import pandas as pd
 
 class DataDownloader:
     def __init__(self, companies, start_date, end_date):
@@ -39,7 +40,10 @@ class DataDownloader:
                 continue
 
             try:
-                data = yf.download(ticker, start=self.start_date, end=self.end_date)
+                # Adjust the end date to include the next day
+                end_date_adjusted = (self.end_date + timedelta(days=1)).strftime("%Y-%m-%d")
+
+                data = yf.download(ticker, start=self.start_date, end=end_date_adjusted)
 
                 if not data.empty:
                     # Save the downloaded data to a CSV file in the specific folder
@@ -54,5 +58,4 @@ class DataDownloader:
             except Exception as e:
                 print(f"Failed to download data for {company}: {str(e)}")
 
-        print("Data downloading complete. ")
-        print("kill me")
+        print("Data downloading complete.")
