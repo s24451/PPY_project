@@ -54,4 +54,5 @@ class DataDownloader:
             except Exception as e:
                 print(f"Failed to download data for {company}: {str(e)}")
 
-        print("Data downloading complete.")
+        print("Data downloading complete. ")
+        print("kill me")
