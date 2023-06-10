@@ -87,7 +87,7 @@ class GUI:
 
         for bank in banks:
             filename = os.path.join(os.getcwd(), bank.replace(" ", "_"),
-                                    f"{bank.replace(' ', '_')}_data_{start_date}_to_{end_date}.csv")
+                                f"{bank.replace(' ', '_')}_data_{start_date}_to_{end_date}.csv")
             data = pd.read_csv(filename)
             cleaned_data = downloader.clean_data(data)
             cleaned_data['Company'] = bank  # Add a column for the company name
@@ -95,9 +95,22 @@ class GUI:
 
         self.update_graph()
 
+        results = []
+        for data in self.data_list:
+            average_closing_price = self.calculate_average_closing_price(data)
+            results.append(f"Company: {data['Company'][0]}, Average Closing Price: {average_closing_price:.2f}")
+
         self.result_label.config(
-            text=f"Selected dates: {start_date} - {end_date}, Company(s): {', '.join(banks)}")
+            text=f"Selected dates: {start_date} - {end_date}\n" + "\n".join(results)
+    )
+
+
         
+    def calculate_average_closing_price(self, data):
+        if not data.empty:
+            return data['Close'].mean()
+        return 0
+    
     def handle_window_close(self):
         if self.data_downloader:
             self.data_downloader.cleanup_data()
