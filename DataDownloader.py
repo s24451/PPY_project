@@ -3,11 +3,13 @@ import yfinance as yf
 from datetime import datetime, timedelta
 import pandas as pd
 import numpy as np 
+import atexit
 
 class DataDownloader:
     def __init__(self, companies, start_date, end_date):
         self.companies = companies
         self.data = {}
+        atexit.register(self.cleanup_data)
 
         # Convert the dates to datetime.date if they are not already
         if isinstance(start_date, str):
@@ -110,6 +112,13 @@ class DataDownloader:
         cleaned_data = cleaned_data.dropna(subset=numerical_columns)
 
         return cleaned_data
+    def cleanup_data(self):
+        # Delete the downloaded data files
+        for company in self.companies:
+            filename = os.path.join(os.getcwd(), company.replace(" ", "_"),
+                                    f"{company.replace(' ', '_')}_data_{self.start_date}_to_{self.end_date}.csv")
+            if os.path.exists(filename):
+                os.remove(filename)
 
 
 
