@@ -94,9 +94,6 @@ class DataDownloader:
 
         return data
 
-
-
-
     def clean_data(self, data):
         cleaned_data = data.copy()
 
@@ -104,14 +101,21 @@ class DataDownloader:
         if 'Date' in cleaned_data.columns:
             cleaned_data['Date'] = pd.to_datetime(cleaned_data['Date'], errors='coerce')
 
-    # Convert numerical columns to float type and fill missing values with column mean
+    # Convert numerical columns to float type
         numerical_columns = cleaned_data.select_dtypes(include=[np.number]).columns.tolist()
         cleaned_data[numerical_columns] = cleaned_data[numerical_columns].apply(pd.to_numeric, errors='coerce')
+
+    # Fill missing values in numerical columns with column means
+        cleaned_data[numerical_columns] = cleaned_data[numerical_columns].fillna(cleaned_data[numerical_columns].mean())
 
     # Drop rows with missing values in numerical columns
         cleaned_data = cleaned_data.dropna(subset=numerical_columns)
 
         return cleaned_data
+
+    
+
+        
     def cleanup_data(self):
         # Delete the downloaded data files
         for company in self.companies:
