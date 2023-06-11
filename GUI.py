@@ -13,6 +13,7 @@ import sys
 
 class GUI:
     def __init__(self):
+
         self.window = tk.Tk()
         self.create_main_window()
         self.create_layout()
@@ -25,12 +26,14 @@ class GUI:
         self.stats_frame.grid(row=7, column=0, columnspan=2, padx=10, pady=10)
         self.statistics_calculator = StatisticsCalculator()
 
-
+    #creating main window
     def create_main_window(self):
         self.window.title("Stock Data Analysis")
         self.window.geometry("1100x1000")
         self.window.config(bg="white")
 
+    
+    #creating layout of GUI
     def create_layout(self):
         self.create_bank_selection()
 
@@ -62,7 +65,10 @@ class GUI:
         self.plot_frame = tk.Frame(self.window, bg="white")
         self.plot_frame.grid(row=0, column=2, rowspan=7, padx=10, pady=10, sticky="n")
 
+
+    #checkboxes for company selection
     def create_bank_selection(self):
+
         self.bank_var1 = tk.BooleanVar()
         self.bank_var2 = tk.BooleanVar()
 
@@ -76,6 +82,7 @@ class GUI:
         self.bank_check2.grid(row=1, column=1, padx=10)
 
     def handle_process_button(self):
+
         start_date = self.start_date_entry.get_date().strftime("%Y-%m-%d")
         end_date = self.end_date_entry.get_date().strftime("%Y-%m-%d")
 
@@ -98,14 +105,14 @@ class GUI:
         downloader = DataDownloader(banks, start_date, end_date)
         downloader.download_data()
 
-        self.data_list = []  # Clear the existing data
+        self.data_list = []  
 
         for bank in banks:
             filename = os.path.join(os.getcwd(), bank.replace(" ", "_"),
                                     f"{bank.replace(' ', '_')}_data_{start_date}_to_{end_date}.csv")
             data = pd.read_csv(filename)
             cleaned_data = downloader.clean_data(data)
-            cleaned_data['Company'] = bank  # Add a column for the company name
+            cleaned_data['Company'] = bank  
             self.data_list.append(cleaned_data)
 
         self.update_graph()
@@ -147,7 +154,7 @@ class GUI:
             self.result_label.config(text="No data available for volume analysis.")
             return
 
-    # Clear the existing graph
+    # Clearing the existing graph
         self.plot_frame.destroy()
         self.plot_frame = tk.Frame(self.window, bg="white")
         self.plot_frame.grid(row=0, column=2, rowspan=7, padx=10, pady=10, sticky="n")
@@ -170,10 +177,10 @@ class GUI:
         volume_canvas.draw()
         volume_canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
-    # Set the flag to indicate volume analysis button is pressed
+    # Setting the flag to indicate volume analysis button is pressed
         self.volume_analysis_button_pressed = True
 
-    # Update the result label
+    # Updating the result label
         results = []
         for data in self.data_list:
             average_closing_price = self.calculate_average_closing_price(data)
@@ -184,7 +191,7 @@ class GUI:
             text=f"Selected dates: {self.start_date} - {self.end_date}\n" + "\n".join(results)
     )
 
-    # Calculate and display statistics for volume
+    # Calculating and displaying statistics for volume
         for widget in self.stats_frame.winfo_children():
             widget.destroy()
         statistics = self.statistics_calculator.calculate_statistics(self.data_list, column='Volume')
@@ -214,6 +221,8 @@ class GUI:
         if not data.empty:
             return data['Volume'].mean()
         return 0
+    
+    #to end the program if the gui window is closed
 
     def handle_window_close(self):
         if self.data_downloader:
@@ -221,7 +230,7 @@ class GUI:
         sys.exit()
 
     def update_graph(self):
-        # Clear the plot frame
+        # Clearing the plot frame
         self.plot_frame.destroy()
         self.plot_frame = tk.Frame(self.window, bg="white")
         self.plot_frame.grid(row=0, column=2, rowspan=7, padx=10, pady=10, sticky="n")
@@ -254,6 +263,6 @@ class GUI:
         self.window.mainloop()
 
 
-# Create an instance of the GUI class
+
 gui = GUI()
 gui.run()
