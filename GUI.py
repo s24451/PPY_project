@@ -1,3 +1,4 @@
+from StatisticsCalculator import StatisticsCalculator
 import tkinter as tk
 from tkinter import ttk
 from tkcalendar import DateEntry
@@ -7,6 +8,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import pandas as pd
 import os
 import sys
+
 
 
 class GUI:
@@ -19,9 +21,14 @@ class GUI:
         self.window.protocol("WM_DELETE_WINDOW", self.handle_window_close)
         self.volume_analysis_button_pressed = False
 
+        self.stats_frame = tk.Frame(self.window, bg="white")
+        self.stats_frame.grid(row=7, column=0, columnspan=2, padx=10, pady=10)
+        self.statistics_calculator = StatisticsCalculator()
+
+
     def create_main_window(self):
         self.window.title("Stock Data Analysis")
-        self.window.geometry("1000x1000")
+        self.window.geometry("1100x1000")
         self.window.config(bg="white")
 
     def create_layout(self):
@@ -113,13 +120,34 @@ class GUI:
         )
 
 
+        for widget in self.stats_frame.winfo_children():
+            widget.destroy()
+        statistics = self.statistics_calculator.calculate_statistics(self.data_list)
+        table = ttk.Treeview(self.stats_frame)
+        table['columns'] = ('mean', 'median', 'std')
+        table.heading('#0', text='Statistic')
+        table.heading('mean', text='Mean')
+        table.heading('median', text='Median')
+        table.heading('std', text='Standard Deviation')
+
+        table.column('#0', width=100, stretch=tk.NO)
+        table.column('mean', width=100, stretch=tk.NO)
+        table.column('median', width=100, stretch=tk.NO)
+        table.column('std', width=150, stretch=tk.NO)
+        for stat, values in statistics.items():
+            table.insert('', tk.END, text=stat, values=values)
+
+        table.pack()
+
+
+
 
     def handle_volume_analysis_button(self):
         if not self.data_list:
             self.result_label.config(text="No data available for volume analysis.")
             return
 
-        # Clear the existing graph
+    # Clear the existing graph
         self.plot_frame.destroy()
         self.plot_frame = tk.Frame(self.window, bg="white")
         self.plot_frame.grid(row=0, column=2, rowspan=7, padx=10, pady=10, sticky="n")
@@ -134,7 +162,7 @@ class GUI:
         volume_ax.set_title('Stock Volume Variation')
         volume_ax.legend()
 
-        # Adjust x-axis margins and spacing
+    # Adjust x-axis margins and spacing
         volume_fig.autofmt_xdate()
         volume_fig.tight_layout(pad=2.0, h_pad=1.0)
 
@@ -142,10 +170,10 @@ class GUI:
         volume_canvas.draw()
         volume_canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
-        # Set the flag to indicate volume analysis button is pressed
+    # Set the flag to indicate volume analysis button is pressed
         self.volume_analysis_button_pressed = True
 
-        # Update the result label
+    # Update the result label
         results = []
         for data in self.data_list:
             average_closing_price = self.calculate_average_closing_price(data)
@@ -154,7 +182,28 @@ class GUI:
 
         self.result_label.config(
             text=f"Selected dates: {self.start_date} - {self.end_date}\n" + "\n".join(results)
-        )
+    )
+
+    # Calculate and display statistics for volume
+        for widget in self.stats_frame.winfo_children():
+            widget.destroy()
+        statistics = self.statistics_calculator.calculate_statistics(self.data_list, column='Volume')
+        table = ttk.Treeview(self.stats_frame)
+        table['columns'] = ('mean', 'median', 'std')
+        table.heading('#0', text='Statistic')
+        table.heading('mean', text='Mean')
+        table.heading('median', text='Median')
+        table.heading('std', text='Standard Deviation')
+
+        table.column('#0', width=100, stretch=tk.NO)
+        table.column('mean', width=100, stretch=tk.NO)
+        table.column('median', width=100, stretch=tk.NO)
+        table.column('std', width=150, stretch=tk.NO)
+        for stat, values in statistics.items():
+            table.insert('', tk.END, text=stat, values=values)
+
+        table.pack()
+
 
     def calculate_average_closing_price(self, data):
         if not data.empty:
