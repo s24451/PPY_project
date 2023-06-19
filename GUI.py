@@ -1,5 +1,3 @@
-
-
 from StatisticsCalculator import StatisticsCalculator
 import tkinter as tk
 from tkinter import ttk
@@ -17,11 +15,10 @@ class GUI:
         self.window = tk.Tk()
         self.create_main_window()
         self.create_layout()
-        self.data_list = []  # Store the processed data
+        self.data_list = [] 
         self.data_downloader = None
         self.window.protocol("WM_DELETE_WINDOW", self.handle_window_close)
         self.volume_analysis_button_pressed = False
-
         self.stats_frame = tk.Frame(self.window, bg="white")
         self.stats_frame.grid(row=7, column=0, columnspan=2, padx=10, pady=10)
         self.statistics_calculator = StatisticsCalculator()
@@ -237,7 +234,8 @@ class GUI:
         sys.exit()
 
     def update_graph(self):
-        # Clearing the plot frame
+        #deletes previous graph and creates new one
+    
         self.plot_frame.destroy()
         self.plot_frame = tk.Frame(self.window, bg="white")
         self.plot_frame.grid(row=0, column=2, rowspan=7, padx=10, pady=10, sticky="n")
@@ -258,7 +256,7 @@ class GUI:
         ax.set_title('Stock Price Variation')
         ax.legend()
 
-        # Adjust x-axis margins and spacing
+        
         figure.autofmt_xdate()
         figure.tight_layout(pad=2.0, h_pad=1.0)
 
